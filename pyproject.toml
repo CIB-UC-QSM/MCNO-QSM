@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcno-qsm"
+version = "0.1.0"
+description = "CNN and dipolelet spectral network for a Sim2 QSM overfit experiment"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "torch>=2.9,<3",
+  "numpy>=2.2,<3",
+  "scipy>=1.15,<2",
+  "nibabel>=5.3,<6",
+  "matplotlib>=3.10,<4",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10"]
+
+[project.scripts]
+mcno-qsm = "mcno_qsm.train:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
