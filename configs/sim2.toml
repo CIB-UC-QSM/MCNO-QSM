@@ -1,0 +1,29 @@
+[data]
+field = "Sim2.mat"
+ground_truth = "Sim2ChiGT.nii.gz"
+mask = "mask_final.mat"
+crop_start = [0, 0, 0]
+field_scale = 1.0
+b0 = [0.0, 0.0, 1.0]
+
+[model]
+depth = 1
+scales = 3
+angular_bands = [8, 4, 2]
+delta = 0.03
+tightness = 100.0
+width = 16
+chunk_size = 262144
+checkpoint = true
+
+[training]
+steps = 2000
+learning_rate = 0.001
+seed = 42
+device = "auto"
+padding = 16
+physics_weight = 1.0
+l1_weight = 1.0
+target_nrmse = 0.10
+snapshot_every = 100
+output = "runs/sim2"
