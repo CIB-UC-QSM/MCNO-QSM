@@ -1,0 +1,405 @@
+"""Writes notebooks/network_performance_so_far.ipynb (run: python -I notebooks/build_performance_notebook.py)."""
+
+import json
+from pathlib import Path
+
+cells = []
+
+
+def md(text):
+    cells.append({"cell_type": "markdown", "metadata": {}, "source": text.strip("\n").splitlines(True)})
+
+
+def code(text):
+    cells.append({"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [],
+                  "source": text.strip("\n").splitlines(True)})
+
+
+md("""
+# How well does the phase cleaner work so far? (state of 2026-10-23)
+
+One page with everything measured, from the files already on the PC. **Judge cleaning by eNDI at a FIXED number of iterations (25 here, 40 for the late behaviour)**, not by the automatic stop and not by the phase NRMSE: the phase error did not predict the eNDI error in earlier runs.
+
+Networks (all the same 67k-parameter `PhaseCleaner`, 10 Dipole-let segments = 3 scales x 3 bands + coarse remainder, seed 42, 6000 steps):
+
+| name | what changed |
+|---|---|
+| `noise` | trained on the noise family only (SNR 40-100) on RC1 |
+| `mix` | all nine artifact families |
+| `noise_clean` | `noise` + 20% identity examples + SNR 40-200 (the current reference) |
+| `ahead_noise_clean` | `noise_clean` recipe, half of the batches from 85 AHEAD heads |
+| `noise_clean_seg` | `noise_clean` + loss weighted by the eNDI sensitivity of each Dipole-let segment |
+| `noise_clean_calc` | `noise_clean` + a family of strong sources with a corrupted (dropout) shell around them (columns appear when the run has finished) |
+
+**What this notebook cannot show.** Real Sim2 is ONE volume with a noise-like `psi`; the RC1 experiments are in-sample for the head; jumps and phase spheres are invisible to this eNDI. Single seed per network (the seed spread of the noise recipe is about 0.04-0.2 eNDI points).
+""")
+
+code("""
+%matplotlib inline
+import json
+import re
+import sys
+from pathlib import Path
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.rcParams.update({"axes.labelsize": 10, "axes.titlesize": 10, "legend.fontsize": 9, "xtick.labelsize": 8, "ytick.labelsize": 8})
+
+here = [Path.cwd(), *Path.cwd().parents]
+def find(*rel, must=True):
+    for base in here:
+        for r in rel:
+            if (base / r).exists():
+                return base / r
+    if must:
+        raise FileNotFoundError(f"none of {rel} found from {Path.cwd()} or its parents")
+    return None
+
+sys.path.insert(0, str(find("external/FANSI_tools.py", "utils/FANSI_tools.py").parent))
+sys.path.insert(0, str(find("src/mcno_qsm/physics.py").parent.parent))
+from FANSI_tools import imagesc3d2, compute_rmse          # the user's own plotting / RMSE functions
+from io import BytesIO
+from IPython.display import Image, display
+import matplotlib
+print("matplotlib backend:", matplotlib.get_backend())
+
+def show():
+    # Display every figure that is still open as a PNG: works with ANY backend (an inline backend has already shown and closed its own
+    # figures, so nothing is drawn twice).
+    for num in plt.get_fignums():
+        fig = plt.figure(num)
+        buf = BytesIO()
+        fig.savefig(buf, format="png", dpi=90, facecolor=fig.get_facecolor(), bbox_inches="tight")
+        display(Image(data=buf.getvalue()))
+    plt.close("all")
+
+ROOT = find("CLAUDE.md").parent
+RUNS = ROOT / "runs"
+print("project:", ROOT)
+""")
+
+md("""
+## A. Headline table: eNDI NRMSE (%) after 25 and 40 fixed iterations
+
+Read from the `fixed_meta.json` files of the four server exports (`generalization`, `_nc`, `_ah`, `_seg`). `oracle` is the clean masked field `mask*D*chi`. Lower is better; compare each network with `dirty` (the floor) and `noise_clean` (the reference).
+""")
+
+code("""
+METHODS = ["dirty", "noise", "mix", "noise_clean", "ahead_noise_clean", "noise_clean_seg", "noise_clean_calc"]
+SHORT = {"dirty": "dirty", "noise": "noise", "mix": "mix", "noise_clean": "n_clean", "ahead_noise_clean": "ahead", "noise_clean_seg": "n_seg", "noise_clean_calc": "n_calc"}
+ALL = {}
+for name in ("generalization", "generalization_nc", "generalization_ah", "generalization_seg", "generalization_calc"):
+    p = RUNS / name / "fixed_meta.json"
+    if not p.exists():
+        print("missing", p); continue
+    for key, value in json.loads(p.read_text()).items():
+        tag, exp, method = key.split("/")
+        ALL.setdefault((tag, exp), {}).setdefault(method, value)     # first file wins (dirty fields are identical across exports)
+
+ORDER = [("sim2", e) for e in ("sim2_real", "sim2_snr100", "sim2_snrcal", "sim2_snr40", "sim2_jumps", "sim2_spheres")] + \\
+        [("rc1", e) for e in ("exp1", "exp2", "exp3", "exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp11")]
+LABEL = {"sim2_real": "Sim2 REAL", "sim2_snr100": "Sim2 fwd SNR100", "sim2_snrcal": "Sim2 fwd SNR~30", "sim2_snr40": "Sim2 fwd SNR40",
+         "sim2_jumps": "Sim2 fwd+jumps", "sim2_spheres": "Sim2 fwd+chi spheres", "exp1": "RC1 exp1 noiseless", "exp2": "RC1 exp2 SNR100",
+         "exp3": "RC1 exp3 SNR40", "exp4": "RC1 exp4 jumps", "exp5": "RC1 exp5 cylinders", "exp6": "RC1 exp6 phase spheres",
+         "exp7": "RC1 exp7 real tissue", "exp8": "RC1 exp8 STI", "exp9": "RC1 exp9 off-diag", "exp11": "RC1 exp11 chi spheres"}
+
+def at(h, it):
+    return h["nrmse"][min(it, len(h["nrmse"]) - 1)]
+
+def table(it):
+    print(f"eNDI NRMSE %, {it} fixed iterations")
+    print(f"{'experiment':24s}" + "".join(f"{SHORT[m]:>9s}" for m in METHODS) + f"{'oracle':>9s}")
+    for tag, exp in ORDER:
+        d = ALL.get((tag, exp))
+        if d is None:
+            continue
+        o = ALL.get((tag, "oracle"), {}).get("oracle")
+        row = f"{LABEL[exp]:24s}"
+        for m in METHODS:
+            row += f"{at(d[m], it):9.1f}" if m in d else f"{'-':>9s}"
+        row += f"{at(o, it):9.1f}" if o else f"{'-':>9s}"
+        print(row)
+
+table(25)
+print()
+table(40)
+""")
+
+code("""
+# Grouped bars for the real Sim2 and the forward-simulated Sim2 fields at 25 iterations
+exps = [e for t, e in ORDER if t == "sim2" and (t, e) in ALL]
+fig, ax = plt.subplots(figsize=(11, 4))
+width = 0.115
+for i, m in enumerate(METHODS):
+    vals = [at(ALL[("sim2", e)][m], 25) if m in ALL[("sim2", e)] else np.nan for e in exps]
+    ax.bar(np.arange(len(exps)) + (i - (len(METHODS) - 1) / 2) * width, vals, width, label=SHORT[m])
+orc = ALL.get(("sim2", "oracle"), {}).get("oracle")
+if orc:
+    ax.axhline(at(orc, 25), color="k", ls="--", lw=1, label="oracle (clean masked field)")
+ax.set_xticks(np.arange(len(exps)))
+ax.set_xticklabels([LABEL[e] for e in exps], rotation=20, ha="right")
+ax.set_ylabel("eNDI NRMSE % (25 iterations)")
+ax.set_ylim(35, 75)
+ax.legend(ncol=4)
+ax.set_title("Sim2 (never trained on): cleaning removes most of the noise damage; the networks are indistinguishable")
+plt.tight_layout()
+show()
+""")
+
+md("""
+## B. Error against iteration
+
+The dirty fields get WORSE after a few iterations (the noise is fitted), the cleaned fields keep improving. This stability, not a lower minimum, is the main benefit of the cleaner. Dashed black = oracle.
+""")
+
+code("""
+panels = [("sim2", "sim2_real"), ("sim2", "sim2_snrcal"), ("rc1", "exp1"), ("rc1", "exp3"), ("rc1", "exp7"), ("rc1", "exp11")]
+fig, axes = plt.subplots(2, 3, figsize=(13, 6.5))
+for ax, (tag, exp) in zip(axes.ravel(), panels):
+    d = ALL.get((tag, exp))
+    if d is None:
+        ax.set_title(f"{exp}: missing"); continue
+    for m in METHODS:
+        if m in d:
+            ax.plot(d[m]["nrmse"], label=SHORT[m], lw=2 if m == "dirty" else 1.3)
+    o = ALL.get((tag, "oracle"), {}).get("oracle")
+    if o:
+        ax.plot(o["nrmse"], "k--", lw=1, label="oracle")
+    ax.axvline(25, color="grey", lw=0.6)
+    ax.set_title(LABEL[exp]); ax.set_xlabel("iteration"); ax.set_ylabel("NRMSE %")
+    ax.set_ylim(top=min(ax.get_ylim()[1], 140))
+axes[0, 0].legend(fontsize=7)
+plt.tight_layout(); show()
+""")
+
+md("""
+## C. Training curves and the overfitting check
+
+`sel_trained` is the checkpoint-selection score (mean cleaned/input phase error on the RC1 check slab). The noise ratio on training draws and on the held-out slab are the SAME for every network (about 0.47 / 0.45): there is no overfitting, and no network gets lower. The phase NRMSE on Sim2 is a monitoring curve only (never used for selection).
+""")
+
+code("""
+import csv
+RUNS_CSV = {"noise_clean": "s4b_noise_clean", "ahead_noise_clean": "s4b_ahead_noise_clean", "noise_clean_seg": "s4b_noise_clean_seg",
+            "noise_clean_calc": "s4b_noise_clean_calc"}
+def read_csv(p):
+    with open(p, newline="") as s:
+        return list(csv.DictReader(s))
+EV = {k: read_csv(RUNS / v / "eval.csv") for k, v in RUNS_CSV.items() if (RUNS / v / "eval.csv").exists()}
+fig, axes = plt.subplots(1, 4, figsize=(16, 3.6))
+for name, rows in EV.items():
+    step = [float(r["step"]) for r in rows]
+    axes[0].plot(step, [float(r["sel_trained"]) for r in rows], label=name)
+    axes[1].plot(step, [float(r["sim2_nrmse"]) for r in rows], label=name)
+    axes[2].plot(step, [float(r["noise_train"]) / float(r["noise_in_train"]) for r in rows], label=f"{name} train")
+    axes[2].plot(step, [float(r["noise_test"]) / float(r["noise_in_test"]) for r in rows], "--", label=f"{name} held-out")
+    axes[3].plot(step, [float(r["clean_test"]) for r in rows], label=name)
+axes[0].set_title("selection score (RC1 check slab)")
+axes[1].set_title("Sim2 phase NRMSE (monitoring)")
+axes[2].set_title("noise: cleaned/input, train vs held-out")
+axes[3].set_title("damage on a CLEAN field (lower = better)")
+for a in axes:
+    a.set_xlabel("step")
+axes[0].legend(fontsize=8); axes[2].legend(fontsize=6)
+plt.tight_layout(); show()
+""")
+
+md("""
+## D. Can the network remove the artifacts it is trained on? (capacity test)
+
+`s4b_overfit_struct`: full RC1 brain, no hold-out, the four localized families (impulses, cylinders, phase spheres, chi spheres; chi spheres include noise), same head, fresh draws, 4000 steps. Ratio = cleaned error / input error on fresh draws (lower = better; 1 = nothing removed). If `runs/s4b_overfit_struct/eval.csv` is on the PC it is read; otherwise the final row pasted from the server on 2026-10-23 is used.
+""")
+
+code("""
+EMBEDDED = {"noise (never trained)": (0.22894006967544556, 0.4498645067214966), "jumps": (0.012211856432259083, 0.40663936734199524),
+            "cylinders": (0.1102246418595314, 3.9712703227996826), "spheres_phase": (0.027592256665229797, 1.14566969871521),
+            "spheres_chi": (0.2548336088657379, 0.668989360332489), "combo (never trained)": (0.25658220052719116, 0.7534536123275757),
+            "tissue (real psi, untrained)": (0.558443546295166, 0.7357805371284485), "sti (untrained)": (0.41142523288726807, 0.4523439407348633),
+            "offdiag (untrained)": (0.5862162113189697, 0.6383130550384521)}
+p = RUNS / "s4b_overfit_struct" / "eval.csv"
+if p.exists():
+    r = read_csv(p)[-1]
+    cap = {k: (float(r[f]), float(r[f + "_in"])) for k, f in (("noise (never trained)", "noise"), ("jumps", "jumps"), ("cylinders", "cylinders"),
+           ("spheres_phase", "spheres_phase"), ("spheres_chi", "spheres_chi"), ("combo (never trained)", "combo"),
+           ("tissue (real psi, untrained)", "tissue"), ("sti (untrained)", "sti"), ("offdiag (untrained)", "offdiag"))}
+    print("read", p)
+else:
+    cap = EMBEDDED
+    print("using the embedded final row (step 4000)")
+names = list(cap)
+ratio = [cap[n][0] / cap[n][1] for n in names]
+fig, ax = plt.subplots(figsize=(9, 3.6))
+colors = ["tab:green" if n in ("jumps", "cylinders", "spheres_phase", "spheres_chi") else "tab:grey" for n in names]
+ax.bar(names, ratio, color=colors)
+ax.axhline(1, color="k", lw=0.6)
+for i, v in enumerate(ratio):
+    ax.text(i, v + 0.02, f"{v:.2f}", ha="center", fontsize=8)
+ax.set_ylabel("cleaned / input error"); ax.set_title("green = trained on, grey = never trained (removal capacity test)")
+plt.xticks(rotation=25, ha="right"); plt.tight_layout(); show()
+""")
+
+md("""
+## E. Real Sim2: the fields
+
+Dirty `Frequency.nii`, the cleaned field of `noise_clean`, the clean target `mask*D*chi` and the errors, each through the planes of `imagesc3d2` (the plotting function of the paper notebook), titled with `compute_rmse` inside the mask. The centre is the voxel of the strongest susceptibility source (the calcification); set `POS` by hand to look elsewhere. Needs `dataRC2/` and `runs/s4b_noise_clean/best_clean.nii.gz` on the PC.
+""")
+
+code("""
+import nibabel as nib
+from mcno_qsm.scoring import forward_field
+RC2 = find("dataRC2/Chi.nii").parent
+chi2 = nib.load(RC2 / "Chi.nii").get_fdata(dtype=np.float32)
+mask2 = nib.load(RC2 / "MaskBrainExtracted.nii").get_fdata(dtype=np.float32) > 0
+mk = mask2.astype(np.float32)
+freq2 = nib.load(RC2 / "Frequency.nii").get_fdata(dtype=np.float32) / (42.58 * 7.0) * mk
+vox2 = tuple(float(v) for v in nib.load(RC2 / "Chi.nii").header.get_zooms()[:3])
+target2 = forward_field(chi2, mk, vox2)
+CLEAN = {}
+for m in ("noise", "noise_clean", "noise_clean_calc"):
+    q = RUNS / f"s4b_{m}" / "best_clean.nii.gz"
+    if q.exists():
+        CLEAN[m] = nib.load(q).get_fdata(dtype=np.float32) * mk
+print("cleaned volumes available:", list(CLEAN))
+
+ROT_SIM2 = [90, 90, 90]
+FIELD = [-0.03, 0.03]; STRONG = [-0.12, 0.12]; ERR = [-0.015, 0.015]
+def view(vol, title, contrast, pos):
+    imagesc3d2(vol, pos, cmap="grey", contrast=contrast, fig_num=2, rot_deg=ROT_SIM2, scale_fig=[-0.12, 0.12, -0.12, 0.12],
+               avg_size=0, title_fig=title)
+    show()
+
+inside = np.where(mask2, chi2, 0)
+POS = tuple(int(v) for v in np.unravel_index(np.argmax(np.abs(inside)), inside.shape))
+print("strongest |chi| in the mask at", POS, "value %.2f ppm" % inside[POS])
+r = lambda a: compute_rmse(a[mask2], target2[mask2])
+view(target2, "clean target mask*D*chi", FIELD, POS)
+view(freq2, f"dirty field: RMSE {r(freq2):.1f}%", FIELD, POS)
+for m, vol in CLEAN.items():
+    view(vol, f"{m} cleaned: RMSE {r(vol):.1f}%", FIELD, POS)
+view(freq2 - target2, "error of the dirty field", ERR, POS)
+for m, vol in CLEAN.items():
+    view(vol - target2, f"error after {m}", ERR, POS)
+""")
+
+md("""
+## F. The calcification: what is wrong there, and what the cleaner does to it
+
+Gain = sum(yhat*b)/sum(b^2) in bins of the true amplitude |b| (1 = signal kept, 0 = lost). The DIRTY input already lacks the strong field (gain 0.55 at 0.1-0.15 ppm, 0.01 above 0.15 ppm), and within 3 mm of the 37 calcification voxels it keeps only 32% of the true field with an error as large as the signal. The cleaner changes this very little. So the calcification streaking of Sim2 starts as a small corrupted shell in the INPUT, not as shrinkage by the network.
+""")
+
+code("""
+from scipy import ndimage
+b = target2
+bins = [0, 0.01, 0.02, 0.04, 0.06, 0.08, 0.10, 0.15, 1.0]
+labels = [f"{lo:.2f}-{hi:.2f}" for lo, hi in zip(bins[:-1], bins[1:])]
+fields = {"dirty": freq2, **CLEAN}
+ab = np.abs(b[mask2])
+fig, axes = plt.subplots(1, 3, figsize=(15, 3.8))
+for name, f in fields.items():
+    gain = []
+    for lo, hi in zip(bins[:-1], bins[1:]):
+        s = (ab >= lo) & (ab < hi)
+        bb, yy = b[mask2][s], f[mask2][s]
+        gain.append((yy * bb).sum() / (bb * bb).sum() if s.sum() > 5 else np.nan)
+    axes[0].plot(labels, gain, "o-", label=name)
+axes[0].axhline(1, color="k", lw=0.6)
+axes[0].set_xlabel("true |b| (ppm)"); axes[0].set_ylabel("gain"); axes[0].set_title("signal kept vs amplitude")
+axes[0].tick_params(axis="x", rotation=45); axes[0].legend()
+calc = (chi2 < -0.5) & mask2
+dist = ndimage.distance_transform_edt(~calc, sampling=vox2)
+shells = [(0, 3), (3, 6), (6, 10), (10, 20), (20, 40), (40, 1e9)]
+names = [f"{lo}-{int(hi) if hi < 1e8 else 'inf'}" for lo, hi in shells]
+for name, f in fields.items():
+    g, e = [], []
+    for lo, hi in shells:
+        s = mask2 & (dist >= lo) & (dist < hi)
+        bb, yy = b[s], f[s]
+        g.append((yy * bb).sum() / (bb * bb).sum()); e.append(np.sqrt(((yy - bb) ** 2).mean()) / np.sqrt((bb ** 2).mean()))
+    axes[1].plot(names, g, "o-", label=name); axes[2].plot(names, e, "o-", label=name)
+axes[1].set_title("gain vs distance to the calcification (mm)"); axes[2].set_title("relative field error vs distance (mm)")
+for a in axes[1:]:
+    a.set_xlabel("distance (mm)")
+axes[1].axhline(1, color="k", lw=0.6)
+plt.tight_layout(); show()
+print("calcification voxels (Chi < -0.5 ppm):", int(calc.sum()), "  min chi %.2f ppm" % chi2.min())
+""")
+
+md("""
+## G. Which Dipole-let segments carry the eNDI damage
+
+From `runs/segments_seg/table.txt` (real Sim2, segment error alone added to the clean field, 25 iterations; band0 = core |D|<0.05, band1 = 0.05-0.33, band2 = far from the cone). The damage sits in band 1 at the fine scales and in the coarse remainder; the cleaner removes the fine-scale part and leaves the coarse and scale-3 parts. `noise_clean_seg` (weighting the loss by this sensitivity) leaves everything unchanged.
+""")
+
+code("""
+p = RUNS / "segments_seg" / "table.txt"
+rows = []
+if p.exists():
+    for line in p.read_text().splitlines():
+        if re.match(r"^(scale\\d/band\\d|coarse)\\s", line):
+            name, rest = line.split(None, 1)
+            nums = [float(x) for x in re.findall(r"-?\\d+\\.\\d+", rest.replace("%", ""))]
+            rows.append((name, nums))
+    names = [r[0] for r in rows]
+    # numbers per row: field%, g_s, then (rel.err, left, damage) for dirty, noise_clean, noise_clean_seg
+    g = [r[1][1] for r in rows]
+    dmg = {"dirty": [r[1][4] for r in rows], "noise_clean": [r[1][7] for r in rows], "noise_clean_seg": [r[1][10] for r in rows]}
+    left = {"noise_clean": [r[1][6] for r in rows], "noise_clean_seg": [r[1][9] for r in rows]}
+    fig, axes = plt.subplots(1, 3, figsize=(15, 3.8))
+    axes[0].bar(names, g); axes[0].set_title("eNDI sensitivity g_s (points per 10% error)")
+    w = 0.27
+    for i, (k, v) in enumerate(dmg.items()):
+        axes[1].bar(np.arange(len(names)) + (i - 1) * w, v, w, label=k)
+    axes[1].set_xticks(np.arange(len(names))); axes[1].set_xticklabels(names); axes[1].set_title("eNDI damage of the segment error alone (points)"); axes[1].legend()
+    for i, (k, v) in enumerate(left.items()):
+        axes[2].bar(np.arange(len(names)) + (i - 0.5) * 0.4, v, 0.4, label=k)
+    axes[2].set_xticks(np.arange(len(names))); axes[2].set_xticklabels(names); axes[2].set_title("fraction of the dirty error left"); axes[2].legend()
+    for a in axes:
+        a.tick_params(axis="x", rotation=60)
+    plt.tight_layout(); show()
+    print(p.read_text().splitlines()[0])
+else:
+    print("missing", p)
+""")
+
+md("""
+## H. Susceptibility maps
+
+If `runs/chi_fixed25.npz` is on the PC (made on the server by `scripts/export_fixed_chi.py`: eNDI of the dirty, cleaned and oracle fields of the real Sim2 after exactly 25 iterations) it is used. Otherwise the older maps of `runs/notebook_data.npz` (automatic stop, networks `noise` and `mix` of the first S4b runs) are shown, which is NOT the protocol used everywhere else.
+""")
+
+code("""
+from scipy import ndimage
+p25 = RUNS / "chi_fixed25.npz"
+CHI = [-0.1, 0.1]
+if p25.exists():
+    z = np.load(p25)
+    maps = {k[4:]: z[k].astype(np.float32) for k in z.files if k.startswith("chi_")}
+    note = "25 fixed iterations"
+else:
+    z = np.load(RUNS / "notebook_data.npz")
+    maps = {k[4:]: z[k].astype(np.float32) for k in ("chi_dirty", "chi_noise", "chi_mix", "chi_oracle") if k in z.files}
+    note = "automatic stop (older runs)"
+print("protocol:", note, "| maps:", list(maps))
+roi = mask2 & (ndimage.distance_transform_edt(~((chi2 < -0.5) & mask2), sampling=vox2) <= 8.0)
+print("calcification ROI (Chi < -0.5 ppm dilated 8 mm):", int(roi.sum()), "voxels")
+for m, vol in maps.items():
+    print(f"{m:20s} NRMSE whole mask {compute_rmse(vol[mask2], chi2[mask2]):6.2f}%   calcification ROI {compute_rmse(vol[roi], chi2[roi]):6.2f}%   rest of mask {compute_rmse(vol[mask2 & ~roi], chi2[mask2 & ~roi]):6.2f}%")
+view(chi2 * mk, "ground truth chi", CHI, POS)
+for m, vol in maps.items():
+    view(vol * mk, f"{m}: RMSE {compute_rmse(vol[mask2], chi2[mask2]):.1f}% ({note})", CHI, POS)
+""")
+
+md("""
+## Reading guide
+
+* Gains of the cleaner are concentrated in **stability** (no divergence after the best iteration) and in the noise-dominated fields; every variant tried after `noise_clean` (more anatomy, band loss, segment-sensitivity loss, extra local convolutions, a U-Net branch) lands within about 0.5 eNDI points of it.
+* **Not solved**: the real in-vivo-like residuals of RC1 (exp7-9) still diverge after the best iteration; the calcification shell of Sim2 (section F) is missing signal in the input; cylinders and phase spheres are not removed by the noise-type recipes (the capacity test shows they are removable when trained on).
+* Everything is one head / one volume / one seed.
+""")
+
+nb = {"cells": cells, "metadata": {"kernelspec": {"display_name": "mcno-qsm (3.13.2)", "language": "python", "name": "python3"},
+                                   "language_info": {"name": "python"}}, "nbformat": 4, "nbformat_minor": 5}
+out = Path(__file__).with_name("network_performance_so_far.ipynb")
+out.write_text(json.dumps(nb, indent=1), encoding="utf8")
+print("wrote", out)

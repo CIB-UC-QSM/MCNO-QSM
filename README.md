@@ -123,7 +123,7 @@ pérdida sobre un pequeño fantoma sintético.
 
 ## Validación ejecutada
 
-Las 15 pruebas pasan con Python 3.13.3 y PyTorch 2.14.1. Se ejecutaron 100 pasos
+Las 19 pruebas pasan con Python 3.13.3 y PyTorch 2.14.1. Se ejecutaron 100 pasos
 sobre Sim2 completo en una RTX PRO 6000 Blackwell, usando la configuración
 predeterminada y sobrescribiendo únicamente pasos, dispositivo y salida:
 

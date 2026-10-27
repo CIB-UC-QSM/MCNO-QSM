@@ -168,7 +168,27 @@ def main():
     run.add_argument("--output", type=Path)
     run.add_argument("--device", choices=("auto", "cpu", "cuda"))
     run.add_argument("--depth", type=int, help="Number of complete CNN/dipolelet layers")
+    clean = commands.add_parser("clean", help="Train the phase cleaner on RC2 patches (resumable)")
+    clean.add_argument("--config", type=Path, default=Path("configs/sim2_clean.toml"))
+    clean.add_argument("--steps", type=int)
+    clean.add_argument("--output", type=Path)
+    clean.add_argument("--device", choices=("auto", "cpu", "cuda"))
+    clean.add_argument("--resume", action="store_true", help="continue from OUTPUT/last.pt")
+    rc1 = commands.add_parser("rc1", help="Train the phase cleaner on RC1 + simulated artifacts (S4b, resumable)")
+    rc1.add_argument("--config", type=Path, required=True)
+    rc1.add_argument("--steps", type=int)
+    rc1.add_argument("--output", type=Path)
+    rc1.add_argument("--device", choices=("auto", "cpu", "cuda"))
+    rc1.add_argument("--resume", action="store_true", help="continue from OUTPUT/last.pt")
     args = parser.parse_args()
+    if args.command == "clean":
+        from .cleaner_train import cli
+
+        return cli(args)
+    if args.command == "rc1":
+        from .rc1_train import cli
+
+        return cli(args)
     with args.config.open("rb") as stream:
         config = tomllib.load(stream)
     for name in ("steps", "output", "device"):

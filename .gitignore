@@ -4,4 +4,10 @@ __pycache__/
 *.egg-info/
 runs/
 *.mat
+*.nii
+dataRC1/
+dataRC2/
 *.nii.gz
+dataAHEAD/
+
+*.tgz

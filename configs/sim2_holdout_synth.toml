@@ -1,0 +1,49 @@
+# S2b diagnostic: as sim2_holdout.toml but only simulated noise (p_synthetic 1.0), 5000 steps, eval every 250.
+# S2b: same as sim2_clean.toml but trained only on the first 60% of the B0 axis; test slab never seen.
+# Phase cleaner on RC2 (Sim2). Dipolelet parameters are those of utils/Dipole-lets_Paper_Plots_3.ipynb (cell 19).
+
+[data]
+root = "dataRC2"
+field_strength = 7.0   # T, Hz -> ppm with 42.58 * B0
+te = 0.008             # s, only sets the phase scale of the simulated noise draws
+
+[data.holdout]
+axis = 2               # B0 axis (z)
+train_fraction = 0.6   # slices [0, 123) of 205
+gap = 16               # skipped slices; the test slab is [139, 205)
+
+[dipolelet]
+scales = 3
+scaling_law = "static"
+base_angular_bands = 3
+delta = 0.05
+window = "gaussian"          # erf window
+gaussian_width_factor = 0.5
+starlet = "gaussian"
+starlet_sigma = 0.5
+
+[model]
+channels = 16
+blocks = 4
+dilations = [1, 2, 4]
+k_conditioning = true
+checkpoint = true
+
+[training]
+steps = 5000
+learning_rate = 0.001
+weight_decay = 0.0
+grad_clip = 1.0
+seed = 42
+device = "auto"
+patch = 96
+batch_size = 1
+p_synthetic = 1.0      # share of patches whose dirty input is a fresh noise draw
+snr_jitter = 0.3       # +-30% around the SNR calibrated to the rms of psi
+l1_weight = 1.0
+l2_weight = 1.0
+cone_weight = 0.0      # logged as cone_excess; raise only if streaking persists
+log_every = 50
+eval_every = 250
+save_every = 250
+output = "runs/sim2_holdout_synth"

@@ -1,0 +1,53 @@
+\contentsline {section}{\numberline {1}Problem, approach and scope}{3}{section.1}%
+\contentsline {paragraph}{Problem.}{3}{section*.2}%
+\contentsline {paragraph}{Goal.}{3}{section*.3}%
+\contentsline {paragraph}{Approach in one paragraph.}{3}{section*.4}%
+\contentsline {paragraph}{What this report claims, and what it does not.}{3}{section*.5}%
+\contentsline {section}{\numberline {2}Background and notation}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Discrete setting}{3}{subsection.2.1}%
+\contentsline {paragraph}{Fields and units.}{3}{section*.6}%
+\contentsline {subsection}{\numberline {2.2}Dipole kernel and the magic cone}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Dipole-lets}{4}{subsection.2.3}%
+\contentsline {paragraph}{Radial part (undecimated/starlet cascade).}{4}{section*.7}%
+\contentsline {paragraph}{Angular part (proximity to $\Sigma $).}{4}{section*.8}%
+\contentsline {paragraph}{Dipole-let operators.}{4}{section*.9}%
+\contentsline {paragraph}{Parameters used here, and how the implementation differs from the formulas above.}{4}{section*.10}%
+\contentsline {section}{\numberline {3}The network}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Overview}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}The Dipole-let spectral block}{7}{subsection.3.2}%
+\contentsline {paragraph}{Segment operator.}{7}{section*.14}%
+\contentsline {paragraph}{Block.}{7}{section*.15}%
+\contentsline {paragraph}{Fourier-multiplier view.}{7}{section*.16}%
+\contentsline {subsection}{\numberline {3.3}Properties}{7}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Parameter inventory}{8}{subsection.3.4}%
+\contentsline {paragraph}{Plain-FNO ablation.}{8}{section*.19}%
+\contentsline {section}{\numberline {4}Training data}{9}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Sources}{9}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Clean target and pairs}{9}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Artifact families}{9}{subsection.4.3}%
+\contentsline {paragraph}{Mixture.}{10}{section*.21}%
+\contentsline {subsection}{\numberline {4.4}Anatomy augmentation}{10}{subsection.4.4}%
+\contentsline {paragraph}{Patch-level augmentation.}{10}{section*.22}%
+\contentsline {subsection}{\numberline {4.5}Hold-out and what it does and does not protect}{10}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Objective, optimisation and evaluation}{11}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Loss}{11}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Optimisation}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Selection and monitoring}{11}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Scoring with eNDI}{12}{subsection.5.4}%
+\contentsline {section}{\numberline {6}Computational method}{12}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Software structure}{12}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Algorithms}{12}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Cost model}{12}{subsection.6.3}%
+\contentsline {paragraph}{Memory.}{13}{section*.26}%
+\contentsline {paragraph}{Numerical precision.}{13}{section*.29}%
+\contentsline {subsection}{\numberline {6.4}Reproducibility, resumption and tests}{14}{subsection.6.4}%
+\contentsline {section}{\numberline {7}What has been found so far}{14}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Sim2's non-dipolar part (S0)}{14}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Single-volume fit and the first held-out test (S2)}{15}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Training-set gate for the RC1 plan (S4a)}{15}{subsection.7.3}%
+\contentsline {paragraph}{Diversity, honestly.}{15}{section*.33}%
+\contentsline {subsection}{\numberline {7.4}Status of the RC1 experiments (S4b)}{15}{subsection.7.4}%
+\contentsline {section}{\numberline {8}Limitations and threats to validity}{17}{section.8}%
+\contentsline {section}{\numberline {9}Next steps}{17}{section.9}%
+\contentsline {section}{\numberline {A}Symbol table and code correspondence}{18}{appendix.A}%
+\contentsline {section}{\numberline {B}Default configuration (S4b)}{19}{appendix.B}%

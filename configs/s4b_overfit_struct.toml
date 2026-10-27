@@ -1,0 +1,56 @@
+# Overfitting / capacity test (CLAUDE.md 9ae): can the net remove the artifacts it is trained on? FULL RC1 brain (no hold-out), NO noise,
+# the four localized synthetic families only (jumps, cylinders, spheres_phase, spheres_chi), no head rotation, no Sim2. Evaluation = fresh draws
+# on the same head. If the ratios cleaned/input stay far from 0 here, the architecture or loss cannot represent the removal.
+
+[data]
+rc1 = "dataRC1"
+
+[artifacts]
+snr_low = 40.0
+snr_high = 200.0
+outside = "clean"
+
+[artifacts.weights]
+jumps = 1.0
+cylinders = 1.0
+spheres_phase = 1.0
+spheres_chi = 1.0
+
+[objects]
+probability = 0.0      # no head rotation: same head, same pose
+max_angle_deg = 20.0
+scale = [0.9, 1.1]
+
+[dipolelet]
+scales = 3
+scaling_law = "static"
+base_angular_bands = 3
+delta = 0.05
+window = "gaussian"
+gaussian_width_factor = 0.5
+starlet = "gaussian"
+starlet_sigma = 0.5
+
+[model]
+channels = 16
+blocks = 4
+dilations = [1, 2, 4]
+k_conditioning = true
+checkpoint = true
+
+[training]
+steps = 4000
+learning_rate = 0.001
+weight_decay = 0.0
+grad_clip = 1.0
+seed = 42
+device = "auto"
+patch = 96
+batch_size = 2
+l1_weight = 1.0
+l2_weight = 1.0
+cone_weight = 0.0
+log_every = 50
+eval_every = 250
+save_every = 250
+output = "runs/s4b_overfit_struct"

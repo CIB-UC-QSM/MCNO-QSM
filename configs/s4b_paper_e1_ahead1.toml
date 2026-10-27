@@ -1,0 +1,73 @@
+# E1 on one AHEAD subject (instead of the RC1 head): same augmentations as paper_e1_rc1
+# Paper-recipe replication (CLAUDE.md 9bo). Reference recipe: configs/s4b_noise_clean.toml. Sim2 (dataRC2) is monitored only.
+# Dipolelet parameters are those of utils/Dipole-lets_Paper_Plots_3.ipynb (cell 19).
+
+[data]
+rc1 = "dataRC1"        # check slab, input scale and Sim2-independent selection only
+rc2 = "dataRC2"        # monitoring only
+field_strength = 7.0   # T of Sim2 (Hz -> ppm)
+
+[data.ahead]
+root = "dataAHEAD_1mm"  # output of scripts/preprocess_ahead.py
+fraction = 1.0         # every batch from AHEAD heads
+n_train = 1            # number of training subjects (a seeded pick from the 85 of the training split)
+val_subjects = 10
+spare_subjects = 10
+split_seed = 0
+eval_subjects = 3      # validation subjects scored at every eval (logged only)
+crop = 128
+
+[data.holdout]
+axis = 0               # check slab for checkpoint selection: train x in [0,100), gap 12, test [112,160) = 15% of the brain
+train_fraction = 0.625
+gap = 12
+
+[artifacts]
+snr_low = 30.0
+snr_high = 300.0
+outside = "clean"
+chi_scale = [0.5, 2.0]
+voxel_sizes = [1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
+
+[artifacts.weights]
+noise = 1.0
+clean = 0.25
+
+[objects]
+probability = 0.7      # rotated/rescaled heads; the 24 cube rotations move the z axis (B0 stays z) onto x or y
+max_angle_deg = 20.0
+scale = [0.9, 1.1]
+
+[dipolelet]
+scales = 3
+scaling_law = "static"
+base_angular_bands = 3
+delta = 0.05
+window = "gaussian"
+gaussian_width_factor = 0.5
+starlet = "gaussian"
+starlet_sigma = 0.5
+
+[model]
+channels = 16
+blocks = 4
+dilations = [1, 2, 4]
+k_conditioning = true
+checkpoint = true
+
+[training]
+steps = 6000
+learning_rate = 0.001
+weight_decay = 0.0
+grad_clip = 1.0
+seed = 42
+device = "auto"
+patch = 96
+batch_size = 2
+l1_weight = 1.0
+l2_weight = 1.0
+cone_weight = 0.0
+log_every = 50
+eval_every = 250
+save_every = 250
+output = "runs/s4b_paper_e1_ahead1"

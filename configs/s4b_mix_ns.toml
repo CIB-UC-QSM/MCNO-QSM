@@ -1,0 +1,60 @@
+# S4b: train on RC1 + artifacts (mix_ns); Sim2 (dataRC2) is monitored only, never trained on or used for selection.
+# Dipolelet parameters are those of utils/Dipole-lets_Paper_Plots_3.ipynb (cell 19).
+
+[data]
+rc1 = "dataRC1"
+rc2 = "dataRC2"        # monitoring only
+field_strength = 7.0   # T of Sim2 (Hz -> ppm)
+
+[data.holdout]
+axis = 0               # check slab for checkpoint selection: train x in [0,100), gap 12, test [112,160) = 15% of the brain
+train_fraction = 0.625
+gap = 12
+
+[artifacts]
+snr_low = 40.0
+snr_high = 100.0
+outside = "clean"
+
+[artifacts.weights]
+noise = 1.0
+spheres_chi = 1.0
+
+[objects]
+probability = 0.7      # rotated/rescaled heads (real-psi families are never used on them)
+max_angle_deg = 20.0
+scale = [0.9, 1.1]
+
+[dipolelet]
+scales = 3
+scaling_law = "static"
+base_angular_bands = 3
+delta = 0.05
+window = "gaussian"
+gaussian_width_factor = 0.5
+starlet = "gaussian"
+starlet_sigma = 0.5
+
+[model]
+channels = 16
+blocks = 4
+dilations = [1, 2, 4]
+k_conditioning = true
+checkpoint = true
+
+[training]
+steps = 6000
+learning_rate = 0.001
+weight_decay = 0.0
+grad_clip = 1.0
+seed = 42
+device = "auto"
+patch = 96
+batch_size = 2
+l1_weight = 1.0
+l2_weight = 1.0
+cone_weight = 0.0
+log_every = 50
+eval_every = 250
+save_every = 250
+output = "runs/s4b_mix_ns"

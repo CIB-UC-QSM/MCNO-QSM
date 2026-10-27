@@ -1,0 +1,164 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{dipolelets}
+\citation{dipolelets}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Problem, approach and scope}{3}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{3}{Problem, approach and scope}{section.1}{}}
+\newlabel{sec:intro@cref}{{[section][1][]1}{[1][3][]3}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Problem.}{3}{section*.2}\protected@file@percent }
+\newlabel{eq:model}{{1}{3}{Problem}{equation.1}{}}
+\newlabel{eq:model@cref}{{[equation][1][]1}{[1][3][]3}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Goal.}{3}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Approach in one paragraph.}{3}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{What this report claims, and what it does not.}{3}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background and notation}{3}{section.2}\protected@file@percent }
+\newlabel{sec:background}{{2}{3}{Background and notation}{section.2}{}}
+\newlabel{sec:background@cref}{{[section][2][]2}{[1][3][]3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Discrete setting}{3}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Fields and units.}{3}{section*.6}\protected@file@percent }
+\citation{dipolelets}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Dipole kernel and the magic cone}{4}{subsection.2.2}\protected@file@percent }
+\newlabel{eq:D}{{3}{4}{Dipole kernel and the magic cone}{equation.3}{}}
+\newlabel{eq:D@cref}{{[equation][3][]3}{[1][3][]4}{}{}{}}
+\newlabel{eq:forward}{{4}{4}{Dipole kernel and the magic cone}{equation.4}{}}
+\newlabel{eq:forward@cref}{{[equation][4][]4}{[1][4][]4}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Dipole-lets}{4}{subsection.2.3}\protected@file@percent }
+\newlabel{sec:dipolelets}{{2.3}{4}{Dipole-lets}{subsection.2.3}{}}
+\newlabel{sec:dipolelets@cref}{{[subsection][3][2]2.3}{[1][4][]4}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Radial part (undecimated/starlet cascade).}{4}{section*.7}\protected@file@percent }
+\newlabel{eq:radial}{{5}{4}{Radial part (undecimated/starlet cascade)}{equation.5}{}}
+\newlabel{eq:radial@cref}{{[equation][5][]5}{[1][4][]4}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Angular part (proximity to $\Sigma $).}{4}{section*.8}\protected@file@percent }
+\newlabel{eq:angular}{{6}{4}{Angular part (proximity to $\Sigma $)}{equation.6}{}}
+\newlabel{eq:angular@cref}{{[equation][6][]6}{[1][4][]4}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Dipole-let operators.}{4}{section*.9}\protected@file@percent }
+\newlabel{eq:dipolelet}{{7}{4}{Dipole-let operators}{equation.7}{}}
+\newlabel{eq:dipolelet@cref}{{[equation][7][]7}{[1][4][]4}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Parameters used here, and how the implementation differs from the formulas above.}{4}{section*.10}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The Dipole-let filters actually used ($\sigma =0.5$, $J=3$; $\delta _0=0.05,\ \delta _1=1/3$, $w\approx 0.100$), computed with the project code. Left: radial filters and the low-pass residual (solid: analytic $R_j$ of \eqref  {eq:radial}; dashed: as implemented, with the sampled and truncated Gaussian, one axis). The curves nearly coincide for the coarse scale and differ near Nyquist for the two finest ones. Middle: angular windows against $\lvert D\rvert $. Right: the same windows against the polar angle of $\bm  {k}$ (the dashed line is the magic angle).}}{5}{figure.caption.11}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:filters}{{1}{5}{The Dipole-let filters actually used ($\sigma =0.5$, $J=3$; $\delta _0=0.05,\ \delta _1=1/3$, $w\approx 0.100$), computed with the project code. Left: radial filters and the low-pass residual (solid: analytic $R_j$ of \eqref {eq:radial}; dashed: as implemented, with the sampled and truncated Gaussian, one axis). The curves nearly coincide for the coarse scale and differ near Nyquist for the two finest ones. Middle: angular windows against $\abs {D}$. Right: the same windows against the polar angle of $\bk $ (the dashed line is the magic angle)}{figure.caption.11}{}}
+\newlabel{fig:filters@cref}{{[figure][1][]1}{[1][5][]5}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}The network}{5}{section.3}\protected@file@percent }
+\newlabel{sec:arch}{{3}{5}{The network}{section.3}{}}
+\newlabel{sec:arch@cref}{{[section][3][]3}{[1][5][]5}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overview}{5}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The ten windows $\Omega _s=R_jA_m$ in the $(k_x,k_z)$ plane ($k_y=0$), and the residual $R_{\mathrm  {res}}$ (top right). Their sum is identically one (centre right panel shows the sum; maximum deviation $4\cdot 10^{-16}$).}}{6}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:kspace}{{2}{6}{The ten windows $\Omega _s=R_jA_m$ in the $(k_x,k_z)$ plane ($k_y=0$), and the residual $R_{\mathrm {res}}$ (top right). Their sum is identically one (centre right panel shows the sum; maximum deviation $4\cdot 10^{-16}$)}{figure.caption.12}{}}
+\newlabel{fig:kspace@cref}{{[figure][2][]2}{[1][5][]6}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Data flow of the cleaner. The dashed line is the skip: $\psi $ enters the output directly. All tensors have $C=16$ channels between the lift and the head. Local receptive radius: $3+1+2+4=10$ voxels; every spectral block is global.}}{6}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:arch}{{3}{6}{Data flow of the cleaner. The dashed line is the skip: $\psi $ enters the output directly. All tensors have $C=16$ channels between the lift and the head. Local receptive radius: $3+1+2+4=10$ voxels; every spectral block is global}{figure.caption.13}{}}
+\newlabel{fig:arch@cref}{{[figure][3][]3}{[1][6][]6}{}{}{}}
+\newlabel{eq:input}{{8}{6}{Overview}{equation.8}{}}
+\newlabel{eq:input@cref}{{[equation][8][]8}{[1][5][]6}{}{}{}}
+\newlabel{eq:lift}{{9}{6}{Overview}{equation.9}{}}
+\newlabel{eq:lift@cref}{{[equation][9][]9}{[1][5][]6}{}{}{}}
+\newlabel{eq:spatial}{{10}{6}{Overview}{equation.10}{}}
+\newlabel{eq:spatial@cref}{{[equation][10][]10}{[1][5][]6}{}{}{}}
+\newlabel{eq:blocks}{{11}{6}{Overview}{equation.11}{}}
+\newlabel{eq:blocks@cref}{{[equation][11][]11}{[1][5][]6}{}{}{}}
+\newlabel{eq:head}{{12}{6}{Overview}{equation.12}{}}
+\newlabel{eq:head@cref}{{[equation][12][]12}{[1][5][]6}{}{}{}}
+\citation{fno}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces One spectral block, \eqref  {eq:block}. The Dipole-let segments give the cells of the frequency domain; each cell has its own complex channel mixing, modulated by a gain depending on the physical frequency.}}{7}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:block}{{4}{7}{One spectral block, \eqref {eq:block}. The Dipole-let segments give the cells of the frequency domain; each cell has its own complex channel mixing, modulated by a gain depending on the physical frequency}{figure.caption.17}{}}
+\newlabel{fig:block@cref}{{[figure][4][]4}{[1][7][]7}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The Dipole-let spectral block}{7}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Segment operator.}{7}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Block.}{7}{section*.15}\protected@file@percent }
+\newlabel{eq:block}{{14}{7}{Block}{equation.14}{}}
+\newlabel{eq:block@cref}{{[equation][14][]14}{[1][7][]7}{}{}{}}
+\newlabel{eq:gain}{{15}{7}{Block}{equation.15}{}}
+\newlabel{eq:gain@cref}{{[equation][15][]15}{[1][7][]7}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Fourier-multiplier view.}{7}{section*.16}\protected@file@percent }
+\newlabel{eq:symbol}{{16}{7}{Fourier-multiplier view}{equation.16}{}}
+\newlabel{eq:symbol@cref}{{[equation][16][]16}{[1][7][]7}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Properties}{7}{subsection.3.3}\protected@file@percent }
+\newlabel{prop:pou}{{1}{7}{Partition of unity and exact analysis}{proposition.1}{}}
+\newlabel{prop:pou@cref}{{[proposition][1][]1}{[1][7][]7}{}{}{}}
+\citation{ahead}
+\newlabel{prop:id}{{2}{8}{Identity at initialisation}{proposition.2}{}}
+\newlabel{prop:id@cref}{{[proposition][2][]2}{[1][8][]8}{}{}{}}
+\newlabel{prop:real}{{3}{8}{Real-valuedness and inert parameters}{proposition.3}{}}
+\newlabel{prop:real@cref}{{[proposition][3][]3}{[1][8][]8}{}{}{}}
+\newlabel{prop:shift}{{4}{8}{Shift equivariance, and its limits}{proposition.4}{}}
+\newlabel{prop:shift@cref}{{[proposition][4][]4}{[1][8][]8}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Parameter inventory}{8}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Plain-FNO ablation.}{8}{section*.19}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter inventory (measured and derived agree).}}{9}{table.caption.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Training data}{9}{section.4}\protected@file@percent }
+\newlabel{sec:data}{{4}{9}{Training data}{section.4}{}}
+\newlabel{sec:data@cref}{{[section][4][]4}{[1][8][]9}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Sources}{9}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Data sets. AHEAD is stored but not used yet; it contains processed QSM maps rather than raw phase, so all its artifacts would be synthetic and its ``clean'' target would be a reconstruction rather than COSMOS.}}{9}{table.caption.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Clean target and pairs}{9}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Artifact families}{9}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Mixture.}{10}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Anatomy augmentation}{10}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:object}{{4.4}{10}{Anatomy augmentation}{subsection.4.4}{}}
+\newlabel{sec:object@cref}{{[subsection][4][4]4.4}{[1][10][]10}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Patch-level augmentation.}{10}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Hold-out and what it does and does not protect}{10}{subsection.4.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Anatomy augmentation on RC1 (axial slice $z=70$; first column: the head truncated to the training slab, then five random draws). Top: the clean target $m\odot \psi _D(\chi ')$; bottom: $\chi '$.}}{11}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:objaug}{{5}{11}{Anatomy augmentation on RC1 (axial slice $z=70$; first column: the head truncated to the training slab, then five random draws). Top: the clean target $m\odot \psi _D(\chi ')$; bottom: $\chi '$}{figure.caption.23}{}}
+\newlabel{fig:objaug@cref}{{[figure][5][]5}{[1][10][]11}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Objective, optimisation and evaluation}{11}{section.5}\protected@file@percent }
+\newlabel{sec:train}{{5}{11}{Objective, optimisation and evaluation}{section.5}{}}
+\newlabel{sec:train@cref}{{[section][5][]5}{[1][10][]11}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Loss}{11}{subsection.5.1}\protected@file@percent }
+\newlabel{eq:loss}{{17}{11}{Loss}{equation.17}{}}
+\newlabel{eq:loss@cref}{{[equation][17][]17}{[1][10][]11}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Optimisation}{11}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Selection and monitoring}{11}{subsection.5.3}\protected@file@percent }
+\citation{checkpoint}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Training data flow (S4b). Sim2 only enters the evaluation branch.}}{12}{figure.caption.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Scoring with eNDI}{12}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Computational method}{12}{section.6}\protected@file@percent }
+\newlabel{sec:compute}{{6}{12}{Computational method}{section.6}{}}
+\newlabel{sec:compute@cref}{{[section][6][]6}{[1][12][]12}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Software structure}{12}{subsection.6.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Modules of \texttt  {src/mcno\_qsm}.}}{12}{table.caption.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Algorithms}{12}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Cost model}{12}{subsection.6.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Forward pass of one spectral block on a $C\times N_x\times N_y\times N_z$ tensor}}{13}{algorithm.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces One training sample (\texttt  {RC1Source.patch})}}{13}{algorithm.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Memory.}{13}{section*.26}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Peak GPU memory of a training step (measured with \texttt  {scripts/measure\_memory.py}). A full S4b step at $96^3$/2 including the full-volume evaluation peaked at 8.6\,GB in the smoke test.}}{13}{table.caption.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Numerical precision.}{13}{section*.29}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Memory with and without the inner checkpoint level.}}{14}{figure.caption.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Reproducibility, resumption and tests}{14}{subsection.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}What has been found so far}{14}{section.7}\protected@file@percent }
+\newlabel{sec:results}{{7}{14}{What has been found so far}{section.7}{}}
+\newlabel{sec:results@cref}{{[section][7][]7}{[1][14][]14}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Sim2's non-dipolar part (S0)}{14}{subsection.7.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Earlier single-volume experiments (Sim2 only; single volume, single seed). In S2b the fresh-noise test error was lowest after about 500 steps and then rose while the training error kept falling: the network memorised one brain. Training only on simulated noise (never seeing the real $\psi $) gave the same behaviour, so the real noise realisation is not the cause; the likely cause is the lack of anatomical diversity (not proven).}}{15}{table.caption.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Single-volume fit and the first held-out test (S2)}{15}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Training-set gate for the RC1 plan (S4a)}{15}{subsection.7.3}\protected@file@percent }
+\newlabel{sec:gate}{{7.3}{15}{Training-set gate for the RC1 plan (S4a)}{subsection.7.3}{}}
+\newlabel{sec:gate@cref}{{[subsection][3][7]7.3}{[1][14][]15}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Artifact statistics against Sim2 (laptop CPU, 2026-10-20). The SNR that matches Sim2's $\psi $ rms with the RC1 magnitude is $59$, inside the sampled range $[40,100]$.}}{15}{table.caption.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Diversity, honestly.}{15}{section*.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Status of the RC1 experiments (S4b)}{15}{subsection.7.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Left: distribution of $\lvert \psi \rvert $ in the mask per family and for Sim2. Middle: radially averaged $\psi $ spectrum (each normalised by its own total). Right: histograms of the clean targets of RC1 and Sim2 (similar in range).}}{16}{figure.caption.32}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces S4b on Sim2 (single volume). Checkpoints chosen on the RC1 check slab only.}}{16}{table.caption.34}\protected@file@percent }
+\newlabel{tab:s4b}{{7}{16}{S4b on Sim2 (single volume). Checkpoints chosen on the RC1 check slab only}{table.caption.34}{}}
+\newlabel{tab:s4b@cref}{{[table][7][]7}{[1][15][]16}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Limitations and threats to validity}{17}{section.8}\protected@file@percent }
+\newlabel{sec:limits}{{8}{17}{Limitations and threats to validity}{section.8}{}}
+\newlabel{sec:limits@cref}{{[section][8][]8}{[1][17][]17}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Next steps}{17}{section.9}\protected@file@percent }
+\bibcite{dipolelets}{1}
+\bibcite{fno}{2}
+\bibcite{starlet}{3}
+\bibcite{fansi}{4}
+\bibcite{cosmos}{5}
+\bibcite{ahead}{6}
+\bibcite{adam}{7}
+\bibcite{gelu}{8}
+\bibcite{checkpoint}{9}
+\bibcite{cosine}{10}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Symbol table and code correspondence}{18}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}Default configuration (S4b)}{19}{appendix.B}\protected@file@percent }
+\gdef \@abspage@last{19}

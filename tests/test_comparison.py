@@ -15,7 +15,8 @@ def test_memory_depth_selection_uses_measured_peaks(tmp_path, monkeypatch):
     dummy = tmp_path / "data"
     dummy.write_bytes(b"original")
     config = tmp_path / "config.toml"
-    config.write_text(f'[data]\nfield="{dummy}"\nground_truth="{dummy}"\nmask="{dummy}"\n')
+    path = dummy.as_posix()
+    config.write_text(f'[data]\nfield="{path}"\nground_truth="{path}"\nmask="{path}"\n')
     observed = []
 
     def subprocess(command, **kwargs):
